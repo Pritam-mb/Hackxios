@@ -9,31 +9,40 @@ const getAuthHeaders = () => {
   };
 };
 
+// Helper to handle response
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+    throw new Error(error.message || response.statusText);
+  }
+  return response.json();
+};
+
 // Auth API
 export const authAPI = {
-  login: async (email, password) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    return response.json();
-  },
-  
   register: async (name, email, password, coordinates) => {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password, coordinates })
     });
-    return response.json();
+    return handleResponse(response);
+  },
+
+  login: async (email, password) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    return handleResponse(response);
   },
   
   getMe: async () => {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   logout: async () => {
@@ -41,7 +50,7 @@ export const authAPI = {
       method: 'POST',
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleResponse(response);
   }
 };
 
@@ -49,19 +58,19 @@ export const authAPI = {
 export const itemsAPI = {
   getAll: async () => {
     const response = await fetch(`${API_BASE_URL}/items`);
-    return response.json();
+    return handleResponse(response);
   },
   
   getNearby: async (lng, lat, maxDistance = 5000, category = null) => {
     let url = `${API_BASE_URL}/items/nearby?lng=${lng}&lat=${lat}&maxDistance=${maxDistance}`;
     if (category) url += `&category=${category}`;
     const response = await fetch(url);
-    return response.json();
+    return handleResponse(response);
   },
   
   getById: async (id) => {
     const response = await fetch(`${API_BASE_URL}/items/${id}`);
-    return response.json();
+    return handleResponse(response);
   },
   
   create: async (itemData) => {
@@ -70,7 +79,7 @@ export const itemsAPI = {
       headers: getAuthHeaders(),
       body: JSON.stringify(itemData)
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   update: async (id, itemData) => {
@@ -79,7 +88,7 @@ export const itemsAPI = {
       headers: getAuthHeaders(),
       body: JSON.stringify(itemData)
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   delete: async (id) => {
@@ -87,7 +96,7 @@ export const itemsAPI = {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleResponse(response);
   }
 };
 
@@ -95,106 +104,112 @@ export const itemsAPI = {
 export const requestsAPI = {
   getAll: async () => {
     const response = await fetch(`${API_BASE_URL}/requests`);
-    return response.json();
+    return handleResponse(response);
   },
   
   getNearby: async (lng, lat, maxDistance = 5000) => {
     const response = await fetch(`${API_BASE_URL}/requests/nearby?lng=${lng}&lat=${lat}&maxDistance=${maxDistance}`);
-    return response.json();
+    return handleResponse(response);
   },
   
   create: async (requestData) => {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/requests`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(requestData)
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   updateStatus: async (id, status) => {
     const response = await fetch(`${API_BASE_URL}/requests/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ status })
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   delete: async (id) => {
     const response = await fetch(`${API_BASE_URL}/requests/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
-    return response.json();
-  }
-};
-
-// Users API
-export const usersAPI = {
-  register: async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/users/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    });
-    return response.json();
-  },
-  
-  login: async (credentials) => {
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    });
-    return response.json();
-  },
-  
-  getProfile: async (id) => {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`);
-    return response.json();
-  },
-  
-  updatePoints: async (id, points) => {
-    const response = await fetch(`${API_BASE_URL}/users/${id}/points`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points })
-    });
-    return response.json();
+    return handleResponse(response);
   }
 };
 
 // Transactions API
 export const transactionsAPI = {
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/transactions`);
-    return response.json();
+    const response = await fetch(`${API_BASE_URL}/transactions`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
   },
   
   getUserTransactions: async (userId) => {
-    const response = await fetch(`${API_BASE_URL}/transactions/user/${userId}`);
-    return response.json();
+    const response = await fetch(`${API_BASE_URL}/transactions/user/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
   },
   
   create: async (transactionData) => {
     const response = await fetch(`${API_BASE_URL}/transactions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(transactionData)
     });
-    return response.json();
+    return handleResponse(response);
   },
   
   update: async (id, transactionData) => {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(transactionData)
     });
-    return response.json();
+    return handleResponse(response);
+  },
+
+  rate: async (id, ratingData) => {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}/rate`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(ratingData)
+    });
+    return handleResponse(response);
+  }
+};
+
+// Users API
+export const usersAPI = {
+  getLeaderboard: async () => {
+    const response = await fetch(`${API_BASE_URL}/users/leaderboard`);
+    return handleResponse(response);
+  },
+
+  getProfile: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`);
+    return handleResponse(response);
+  },
+  
+  updateProfile: async (id, userData) => {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(userData)
+    });
+    return handleResponse(response);
+  },
+
+  updatePoints: async (id, points) => {
+    const response = await fetch(`${API_BASE_URL}/users/${id}/points`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ points })
+    });
+    return handleResponse(response);
   }
 };

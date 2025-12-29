@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Icon } from '@iconify/react';
 import { itemsAPI } from '../services/api';
+import BackgroundLayout from '../components/BackgroundLayout';
+import SpotlightCard from '../components/SpotlightCard';
 
 const Items = () => {
   const navigate = useNavigate();
@@ -28,39 +31,42 @@ const Items = () => {
     : items.filter(item => item.category === filter);
 
   const categoryColors = {
-    tools: 'bg-blue-500',
-    kitchen: 'bg-green-500',
-    electronics: 'bg-orange-500',
-    outdoor: 'bg-purple-500',
-    sports: 'bg-pink-500',
-    other: 'bg-gray-500'
+    tools: 'bg-[#2C7DA0]',
+    kitchen: 'bg-[#7E9F6D]',
+    electronics: 'bg-[#B5651D]',
+    outdoor: 'bg-[#A8577C]',
+    sports: 'bg-[#D62828]',
+    other: 'bg-[#4A453E]'
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+    <BackgroundLayout>
+      <div className="relative z-10 pt-32 px-6 pb-12 max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Browse Items</h1>
-            <p className="text-slate-400">Discover what your neighbors are sharing</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-[#1B4332] mb-3 tracking-tight" style={{ fontFamily: "'Google Sans', sans-serif" }}>Browse Items</h1>
+            <p className="text-[#4A453E]/80 text-lg">Discover what your neighbors are sharing nearby.</p>
           </div>
           <button
             onClick={() => navigate('/list')}
-            className="px-6 py-3 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full transition-all"
+            className="px-8 py-4 bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-semibold rounded-full shadow-lg shadow-[#1B4332]/20 transition-all hover:-translate-y-1 flex items-center gap-2"
           >
-            + List an Item
+            <Icon icon="lucide:plus" width="20" />
+            <span>List an Item</span>
           </button>
         </div>
 
-        <div className="flex gap-3 mb-8 overflow-x-auto pb-2">
+        {/* Filters */}
+        <div className="flex gap-3 mb-10 overflow-x-auto pb-4 scrollbar-hide">
           {['all', 'tools', 'kitchen', 'electronics', 'outdoor', 'sports', 'other'].map(cat => (
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-full capitalize transition-all whitespace-nowrap ${
+              className={`px-6 py-2.5 rounded-full capitalize font-medium transition-all whitespace-nowrap border ${
                 filter === cat 
-                  ? 'bg-green-500 text-black' 
-                  : 'bg-slate-800 hover:bg-slate-700'
+                  ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-md' 
+                  : 'bg-white text-[#4A453E] border-[#E8E3DB] hover:border-[#1B4332] hover:text-[#1B4332]'
               }`}
             >
               {cat}
@@ -69,63 +75,67 @@ const Items = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-            <p className="mt-4 text-slate-400">Loading items...</p>
+          <div className="text-center py-32">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1B4332]"></div>
+            <p className="mt-4 text-[#4A453E]/60 font-medium">Loading items...</p>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-slate-400 text-lg">No items found. Be the first to list something!</p>
+          <div className="text-center py-32 bg-white/50 rounded-[32px] border border-[#E8E3DB]">
+            <div className="w-20 h-20 bg-[#E8E3DB]/50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Icon icon="lucide:package-open" className="text-[#4A453E]/40" width="40" />
+            </div>
+            <h3 className="text-xl font-bold text-[#1B4332] mb-2">No items found</h3>
+            <p className="text-[#4A453E]/60 text-lg">Be the first to list something in this category!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.map(item => (
-              <div
+              <SpotlightCard
                 key={item._id}
                 onClick={() => navigate(`/items/${item._id}`)}
-                className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-green-500 transition-all cursor-pointer group"
+                className="p-0 overflow-hidden cursor-pointer group h-full"
               >
-                <div className="h-48 bg-slate-800 relative overflow-hidden">
+                <div className="h-56 bg-[#F5F1EA] relative overflow-hidden">
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                    <div className="w-full h-full flex items-center justify-center text-6xl opacity-50">
                       📦
                     </div>
                   )}
-                  <div className={`absolute top-3 right-3 ${categoryColors[item.category]} px-3 py-1 rounded-full text-xs font-bold text-white`}>
+                  <div className={`absolute top-4 right-4 ${categoryColors[item.category] || 'bg-[#4A453E]'} px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-sm`}>
                     {item.category}
                   </div>
                 </div>
 
-                <div className="p-4">
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-slate-400 text-sm mb-4 line-clamp-2">{item.description}</p>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-[#1B4332] mb-2 group-hover:text-[#2D6A4F] transition-colors">{item.title}</h3>
+                  <p className="text-[#4A453E]/70 text-sm mb-6 line-clamp-2 leading-relaxed">{item.description}</p>
                   
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-sm">
+                  <div className="flex items-center justify-between pt-4 border-t border-[#E8E3DB]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-[#1B4332]/10 rounded-full flex items-center justify-center text-sm font-bold text-[#1B4332]">
                         {item.owner?.name?.[0] || '?'}
                       </div>
-                      <span className="text-sm text-slate-400">{item.owner?.name || 'Anonymous'}</span>
+                      <span className="text-sm font-medium text-[#4A453E]/80">{item.owner?.name || 'Anonymous'}</span>
                     </div>
                     
                     <div className="flex items-center gap-2">
                       {item.type === 'rent' && item.price > 0 && (
-                        <span className="text-green-400 font-bold">${item.price}/day</span>
+                        <span className="text-[#1B4332] font-bold bg-[#B7E4C7]/30 px-3 py-1 rounded-full text-sm">${item.price}/day</span>
                       )}
                       {item.type === 'lend' && (
-                        <span className="text-green-400 font-bold">Free</span>
+                        <span className="text-[#1B4332] font-bold bg-[#B7E4C7]/30 px-3 py-1 rounded-full text-sm">Free</span>
                       )}
                     </div>
                   </div>
                 </div>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </BackgroundLayout>
   );
 };
 

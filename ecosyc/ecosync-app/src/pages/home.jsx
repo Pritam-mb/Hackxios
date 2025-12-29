@@ -31,11 +31,11 @@ const Home = () => {
       {/* 1. HERO SECTION */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden">
         {/* Decorative Background Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-green-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-125 h-125 bg-green-500/10 blur-[120px] rounded-full pointer-events-none"></div>
         
         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
           Your Neighborhood, <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-green-400 to-emerald-600">
             Shared.
           </span>
         </h1>
@@ -71,7 +71,7 @@ const Home = () => {
             </div>
           </div>
           
-          <div className="flex-[2] w-full h-[400px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+          <div className="flex-2 w-full h-100 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
             <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: "100%", width: "100%" }}>
               <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
               {items.map(item => (

@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import 'leaflet/dist/leaflet.css';
 import { requestsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import BackgroundLayout from '../components/BackgroundLayout';
+import { Icon } from '@iconify/react';
 
 const RequestMap = () => {
   const { user } = useAuth();
@@ -108,187 +110,194 @@ const RequestMap = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-white">
-      {/* Header */}
-      <div className="p-6 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Community Beacons</h2>
-          <p className="text-slate-400 text-sm">Click the map to set location, then raise your request</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="bg-orange-500/20 text-orange-400 px-4 py-2 rounded-full text-sm animate-pulse border border-orange-500/30">
-            {requests.length} Active Requests
+    <BackgroundLayout>
+      <div className="flex flex-col h-[calc(100vh-80px)] pt-20">
+        {/* Header */}
+        <div className="p-6 bg-white/80 backdrop-blur-md border-b border-[#E8E3DB] flex justify-between items-center relative z-20">
+          <div>
+            <h2 className="text-2xl font-bold text-[#1B4332]" style={{ fontFamily: "'Google Sans', sans-serif" }}>Community Beacons</h2>
+            <p className="text-[#4A453E]/60 text-sm">Click the map to set location, then raise your request</p>
           </div>
-          <button
-            onClick={() => setShowRequestForm(true)}
-            className="px-6 py-2 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full transition-all"
-          >
-            + Raise Request
-          </button>
-        </div>
-      </div>
-
-      <div className="flex-1 relative">
-        <button
-          onClick={getCurrentLocation}
-          className="absolute z-[1000] top-4 right-4 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
-        >
-          📍 My Location
-        </button>
-        
-        <MapContainer
-          center={[51.505, -0.09]}
-          zoom={13}
-          className="h-full w-full"
-          ref={mapRef}
-        >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          <MapClickHandler />
-          
-          {/* User's Current Location Marker */}
-          {userLocation && (
-            <Marker position={userLocation}>
-              <Popup>
-                <div className="text-slate-900">
-                  <p className="font-bold">📍 Your Location</p>
-                </div>
-              </Popup>
-            </Marker>
-          )}
-
-          {/* Render Existing Requests */}
-          {requests.map(req => (
-            <Marker key={req.id} position={req.coords}>
-              <Popup>
-                <div className="text-slate-900">
-                  <p className="font-bold">Neighbor needs: {req.item}</p>
-                  <p className="text-xs text-slate-500 mb-2">Requested by {req.user}</p>
-                  <button className="w-full bg-green-600 text-white py-1 rounded hover:bg-green-700">
-                    I have this!
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-
-          {/* Temporary Marker for new request placement */}
-          {newRequestCoords && !showRequestForm && (
-            <Marker position={newRequestCoords}>
-              <Popup autoOpen>
-                <div className="text-slate-900 p-2">
-                  <p className="font-bold mb-2">📍 Location Selected</p>
-                  <button 
-                    onClick={() => setShowRequestForm(true)}
-                    className="w-full bg-orange-500 text-white py-2 rounded font-bold hover:bg-orange-600"
-                  >
-                    Raise Request Here
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          )}
-        </MapContainer>
-
-        {/* Legend / Tip */}
-        <div className="absolute bottom-10 left-10 z-[1000] bg-slate-900/90 p-4 rounded-xl border border-slate-700 backdrop-blur-md max-w-xs">
-          <p className="text-xs text-slate-300">
-            <span className="text-orange-500 font-bold">Tip:</span> Beacons stay active for 24 hours. Once a neighbor offers help, you'll be notified in Chat.
-          </p>
-        </div>
-      </div>
-
-      {/* Request Form Modal */}
-      {showRequestForm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[2000] flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold">Raise a Request</h3>
-              <button
-                onClick={() => setShowRequestForm(false)}
-                className="text-slate-400 hover:text-white text-2xl"
-              >
-                ×
-              </button>
+          <div className="flex items-center gap-4">
+            <div className="bg-[#B7E4C7]/30 text-[#1B4332] px-4 py-2 rounded-full text-sm font-bold border border-[#B7E4C7] flex items-center gap-2">
+              <span className="w-2 h-2 bg-[#2D6A4F] rounded-full animate-pulse"></span>
+              {requests.length} Active Requests
             </div>
-
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              {/* Item Name */}
-              <div>
-                <label className="block text-sm font-medium mb-2">What do you need?</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Power Drill, Ladder, Lawn Mower"
-                  value={formData.itemName}
-                  onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-green-500"
-                  required
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Description (Optional)</label>
-                <textarea
-                  placeholder="Any specific requirements or details..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-green-500 h-24 resize-none"
-                />
-              </div>
-
-              {/* Urgency */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Urgency</label>
-                <select
-                  value={formData.urgency}
-                  onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-green-500"
-                >
-                  <option value="low">Low - Can wait a few days</option>
-                  <option value="normal">Normal - Within 24 hours</option>
-                  <option value="high">High - Need it ASAP!</option>
-                </select>
-              </div>
-
-              {/* Location Status */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {newRequestCoords ? (
-                      <>
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm text-green-400">Location set</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                        <span className="text-sm text-orange-400">Set your location</span>
-                      </>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={getCurrentLocation}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-all"
-                  >
-                    📍 Use Current
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Creating...' : '🚨 Raise Beacon'}
-              </button>
-            </form>
+            <button
+              onClick={() => setShowRequestForm(true)}
+              className="px-6 py-2 bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold rounded-full transition-all shadow-lg shadow-[#1B4332]/20 hover:-translate-y-1"
+            >
+              + Raise Request
+            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        <div className="flex-1 relative z-10">
+          <button
+            onClick={getCurrentLocation}
+            className="absolute z-1000 top-4 right-4 bg-white hover:bg-[#F5F1EA] text-[#1B4332] px-4 py-2 rounded-xl shadow-xl border border-[#E8E3DB] font-bold transition-all flex items-center gap-2"
+          >
+            <Icon icon="heroicons:map-pin" /> My Location
+          </button>
+          
+          <MapContainer
+            center={[51.505, -0.09]}
+            zoom={13}
+            className="h-full w-full"
+            ref={mapRef}
+            zoomControl={false}
+          >
+            <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+            <MapClickHandler />
+            
+            {/* User's Current Location Marker */}
+            {userLocation && (
+              <Marker position={userLocation}>
+                <Popup>
+                  <div className="text-[#1B4332]">
+                    <p className="font-bold">📍 Your Location</p>
+                  </div>
+                </Popup>
+              </Marker>
+            )}
+
+            {/* Render Existing Requests */}
+            {requests.map(req => (
+              <Marker key={req.id} position={req.coords}>
+                <Popup>
+                  <div className="text-[#4A453E]">
+                    <p className="font-bold text-[#1B4332] mb-1">Neighbor needs: {req.item}</p>
+                    <p className="text-xs text-[#9B9486] mb-3">Requested by {req.user}</p>
+                    <button className="w-full bg-[#1B4332] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#2D6A4F] transition-colors">
+                      I have this!
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+
+            {/* Temporary Marker for new request placement */}
+            {newRequestCoords && !showRequestForm && (
+              <Marker position={newRequestCoords}>
+                <Popup autoOpen>
+                  <div className="text-[#4A453E] p-1">
+                    <p className="font-bold mb-2 text-[#1B4332]">📍 Location Selected</p>
+                    <button 
+                      onClick={() => setShowRequestForm(true)}
+                      className="w-full bg-[#E63946] text-white py-2 rounded-lg font-bold hover:bg-[#D62828] transition-colors text-xs"
+                    >
+                      Raise Request Here
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            )}
+          </MapContainer>
+
+          {/* Legend / Tip */}
+          <div className="absolute bottom-10 left-10 z-1000 bg-white/90 p-4 rounded-2xl border border-[#E8E3DB] backdrop-blur-md max-w-xs shadow-xl">
+            <p className="text-xs text-[#4A453E] leading-relaxed">
+              <span className="text-[#1B4332] font-bold">Tip:</span> Beacons stay active for 24 hours. Once a neighbor offers help, you'll be notified in Chat.
+            </p>
+          </div>
+        </div>
+
+        {/* Request Form Modal */}
+        {showRequestForm && (
+          <div className="fixed inset-0 bg-[#1B4332]/20 backdrop-blur-sm z-2000 flex items-center justify-center p-4">
+            <div className="bg-white border border-[#E8E3DB] rounded-[32px] p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-[#1B4332]" style={{ fontFamily: "'Google Sans', sans-serif" }}>Raise a Request</h3>
+                <button
+                  onClick={() => setShowRequestForm(false)}
+                  className="w-8 h-8 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#4A453E] hover:bg-[#E8E3DB] transition-colors"
+                >
+                  <Icon icon="heroicons:x-mark" />
+                </button>
+              </div>
+
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                {/* Item Name */}
+                <div>
+                  <label className="block text-sm font-bold text-[#1B4332] mb-2 ml-1">What do you need?</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Power Drill, Ladder, Lawn Mower"
+                    value={formData.itemName}
+                    onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
+                    className="w-full bg-[#FAF8F5] border border-[#E8E3DB] rounded-xl px-4 py-3 text-[#1B4332] placeholder-[#4A453E]/40 focus:outline-none focus:border-[#1B4332] focus:ring-1 focus:ring-[#1B4332] transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-bold text-[#1B4332] mb-2 ml-1">Description (Optional)</label>
+                  <textarea
+                    placeholder="Any specific requirements or details..."
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-[#FAF8F5] border border-[#E8E3DB] rounded-xl px-4 py-3 text-[#1B4332] placeholder-[#4A453E]/40 focus:outline-none focus:border-[#1B4332] focus:ring-1 focus:ring-[#1B4332] transition-all h-24 resize-none"
+                  />
+                </div>
+
+                {/* Urgency */}
+                <div>
+                  <label className="block text-sm font-bold text-[#1B4332] mb-2 ml-1">Urgency</label>
+                  <div className="relative">
+                    <select
+                      value={formData.urgency}
+                      onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
+                      className="w-full bg-[#FAF8F5] border border-[#E8E3DB] rounded-xl px-4 py-3 text-[#1B4332] focus:outline-none focus:border-[#1B4332] focus:ring-1 focus:ring-[#1B4332] appearance-none cursor-pointer"
+                    >
+                      <option value="low">Low - Can wait a few days</option>
+                      <option value="normal">Normal - Within 24 hours</option>
+                      <option value="high">High - Need it ASAP!</option>
+                    </select>
+                    <Icon icon="heroicons:chevron-down" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#4A453E]/40 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Location Status */}
+                <div className="bg-[#FAF8F5] border border-[#E8E3DB] rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {newRequestCoords ? (
+                        <>
+                          <div className="w-3 h-3 bg-[#2D6A4F] rounded-full animate-pulse"></div>
+                          <span className="text-sm text-[#2D6A4F] font-medium">Location set</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-3 h-3 bg-[#E63946] rounded-full"></div>
+                          <span className="text-sm text-[#E63946] font-medium">Set your location</span>
+                        </>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={getCurrentLocation}
+                      className="px-3 py-1.5 bg-white border border-[#E8E3DB] hover:border-[#1B4332] text-[#1B4332] text-xs font-bold rounded-lg transition-all shadow-sm"
+                    >
+                      📍 Use Current
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-[#1B4332]/20 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  {loading ? 'Creating...' : 'Raise Beacon'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </BackgroundLayout>
   );
 };
 

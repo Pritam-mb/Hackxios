@@ -1,4 +1,6 @@
 import React from "react";
+import { Icon } from '@iconify/react';
+import BackgroundLayout from '../components/BackgroundLayout';
 
 const ItemDetail = ({ item }) => {
   // Mock data for the demo if 'item' isn't passed
@@ -15,76 +17,83 @@ const ItemDetail = ({ item }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 md:p-12">
-      {/* Breadcrumbs */}
-      <nav className="text-slate-500 text-sm mb-8">
-        Home / Search / <span className="text-green-500">{data.category}</span>
-      </nav>
+    <BackgroundLayout>
+      <div className="relative z-10 pt-32 px-6 pb-12 max-w-7xl mx-auto">
+        {/* Breadcrumbs */}
+        <nav className="text-[#4A453E]/60 text-sm mb-8 font-medium">
+          Home / Search / <span className="text-[#1B4332]">{data.category}</span>
+        </nav>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
-        {/* LEFT: Image Gallery */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="aspect-video rounded-3xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl">
-            <img src={data.image} alt={data.name} className="w-full h-full object-cover" />
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-square rounded-xl bg-slate-900 border border-slate-800 hover:border-green-500 transition cursor-pointer"></div>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT: Details & Booking Sidebar */}
-        <div className="lg:col-span-5">
-          <div className="sticky top-12 p-8 rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-4xl font-bold">{data.name}</h1>
-              <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-bold">
-                {data.price}
-              </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* LEFT: Image Gallery */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="aspect-video rounded-[32px] overflow-hidden border border-[#E8E3DB] bg-white shadow-xl shadow-[#1B4332]/5">
+              <img src={data.image} alt={data.name} className="w-full h-full object-cover" />
             </div>
-
-            <div className="flex items-center gap-4 mb-8 text-slate-400 text-sm">
-              <span className="flex items-center gap-1 text-yellow-400">★ {data.rating}</span>
-              <span>• {data.reviews} Reviews</span>
-              <span>• {data.category}</span>
+            <div className="grid grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="aspect-square rounded-2xl bg-white border border-[#E8E3DB] hover:border-[#1B4332] transition cursor-pointer"></div>
+              ))}
             </div>
+          </div>
 
-            {/* Impact Feature */}
-            <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20 mb-8 flex items-center gap-4">
-              <div className="text-3xl">🍃</div>
-              <div>
-                <p className="text-green-400 font-bold">Eco-Impact</p>
-                <p className="text-sm text-slate-300">By borrowing this, you save <span className="text-white font-bold">{data.co2Saved}</span> of CO2 emissions.</p>
+          {/* RIGHT: Details & Booking Sidebar */}
+          <div className="lg:col-span-5">
+            <div className="sticky top-32 p-8 rounded-[32px] bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl shadow-[#1B4332]/5">
+              <div className="flex justify-between items-start mb-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-[#1B4332] tracking-tight" style={{ fontFamily: "'Google Sans', sans-serif" }}>{data.name}</h1>
+                <span className="bg-[#B7E4C7]/30 text-[#1B4332] px-4 py-1.5 rounded-full text-sm font-bold">
+                  {data.price}
+                </span>
               </div>
-            </div>
 
-            <p className="text-slate-400 leading-relaxed mb-10">
-              {data.desc}
-            </p>
+              <div className="flex items-center gap-4 mb-8 text-[#4A453E]/60 text-sm font-medium">
+                <span className="flex items-center gap-1 text-yellow-500"><Icon icon="heroicons:star-solid" /> {data.rating}</span>
+                <span>• {data.reviews} Reviews</span>
+                <span>• {data.category}</span>
+              </div>
 
-            <div className="space-y-4">
-              <button className="w-full py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-2xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.2)]">
-                Borrow Now
-              </button>
-              <button className="w-full py-4 border border-slate-700 hover:bg-slate-800 rounded-2xl transition-all flex items-center justify-center gap-2">
-                💬 Message {data.owner}
-              </button>
-            </div>
+              {/* Impact Feature */}
+              <div className="p-5 rounded-2xl bg-[#1B4332]/5 border border-[#1B4332]/10 mb-8 flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#1B4332] rounded-full flex items-center justify-center text-white">
+                  <Icon icon="lucide:leaf" width="20" />
+                </div>
+                <div>
+                  <p className="text-[#1B4332] font-bold">Eco-Impact</p>
+                  <p className="text-sm text-[#4A453E]/80">By borrowing this, you save <span className="text-[#1B4332] font-bold">{data.co2Saved}</span> of CO2 emissions.</p>
+                </div>
+              </div>
 
-            {/* Owner Mini-Profile */}
-            <div className="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-green-500 to-blue-500"></div>
-              <div>
-                <p className="font-bold">{data.owner}</p>
-                <p className="text-xs text-slate-500">Verified Neighbor • Joined 2023</p>
+              <p className="text-[#4A453E]/80 leading-relaxed mb-10 text-lg">
+                {data.desc}
+              </p>
+
+              <div className="space-y-4">
+                <button className="w-full py-4 bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold rounded-full transition-all shadow-lg shadow-[#1B4332]/20 hover:-translate-y-1">
+                  Borrow Now
+                </button>
+                <button className="w-full py-4 border border-[#E8E3DB] hover:border-[#1B4332] hover:text-[#1B4332] text-[#4A453E] font-medium rounded-full transition-all flex items-center justify-center gap-2 bg-white">
+                  <Icon icon="lucide:message-circle" width="18" />
+                  Message {data.owner}
+                </button>
+              </div>
+
+              {/* Owner Mini-Profile */}
+              <div className="mt-8 pt-8 border-t border-[#E8E3DB] flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#E8E3DB] flex items-center justify-center text-[#1B4332] font-bold text-xl">
+                  {data.owner[0]}
+                </div>
+                <div>
+                  <p className="font-bold text-[#1B4332]">{data.owner}</p>
+                  <p className="text-xs text-[#4A453E]/60 font-medium">Verified Neighbor • Joined 2023</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </BackgroundLayout>
   );
 };
 

@@ -1,5 +1,5 @@
 import './App.css';
-import Home from './pages/home';
+import LandingPage from './pages/LandingPage';
 import Items from './pages/Items';
 import About from './pages/about';
 import ItemDetail from './pages/ItemDetail';
@@ -16,9 +16,8 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Header />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/items" element={<Items />} />
           <Route path="/items/:id" element={<ItemDetail />} />
           <Route path="/list" element={<ListItem />} />
