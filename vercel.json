@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "ecosyc/ecosync-backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "ecosyc/ecosync-app/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/ecosyc/ecosync-backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/ecosyc/ecosync-app/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/ecosyc/ecosync-app/index.html"
+    }
+  ]
+}
