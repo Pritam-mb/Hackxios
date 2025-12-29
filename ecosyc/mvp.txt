@@ -1,0 +1,273 @@
+# EcoSync MVP - P2P Local Sharing Platform
+
+## 🎯 Core Concept
+A hyperlocal peer-to-peer marketplace where people can lend, borrow, rent, or auction items they don't frequently use. Focus on building community trust while reducing waste and promoting sustainability.
+
+---
+
+## 📱 MVP Feature Set (Phase 1)
+
+### 1. **User Authentication & Profile**
+- Simple OAuth (Google/GitHub login)
+- Basic profile with:
+  - Name, photo, location (area/neighborhood)
+  - Trust score (starts at 0)
+  - Badge display ("Seedling" → "Oak Tree")
+  - Transaction history
+
+### 2. **Map-Based Discovery** ⭐ Core Feature
+- **Landing Page**: Interactive map (Google Maps/Mapbox)
+- **Item Pins**: Color-coded by category
+  - 🔧 Blue: Tools
+  - 🍳 Green: Kitchen items
+  - 📦 Orange: Electronics
+  - 🎪 Purple: Outdoor/Sports
+- **Filters**:
+  - Category dropdown
+  - "Available Now" toggle
+  - Distance radius (500m, 1km, 2km, 5km)
+
+### 3. **Quick Item Listing** (30-second flow)
+**Option A - AI-Powered (Impressive for hackathon)**
+- User uploads photo
+- AI (Gemini/GPT-4 Vision) auto-generates:
+  - Title
+  - Category
+  - Description
+- User adds:
+  - Availability (Lend/Rent/Sell/Auction)
+  - Price (if applicable)
+  - Time slots available
+
+**Option B - Manual (Simpler MVP)**
+- Form with dropdowns and text fields
+- Photo upload
+- Category selection
+
+### 4. **Transaction Flow**
+
+#### **Borrowing/Renting Process:**
+1. **Request**: Click item → Select date/time → Send request
+2. **Chat**: Built-in simple messaging (or integrate Firebase Chat)
+3. **Confirmation**: Lender accepts → System generates handover details
+4. **Pickup**: 
+   - QR Code system (borrower scans lender's code)
+   - Updates status to "In Use"
+   - Auto-captures timestamp
+5. **Return**:
+   - Scan QR again
+   - Upload "Condition Photo" (before/after comparison)
+   - System calculates duration
+
+#### **Rating System:**
+- Both parties rate each other (1-5 stars)
+- Optional text review
+- Builds reputation score
+
+### 5. **Gamification - "Green Credits"** 🌱
+- **Earn Points For**:
+  - Listing items: +10 points
+  - Successful lend: +25 points
+  - Successful borrow: +15 points
+  - On-time return: +5 bonus points
+  
+- **Levels**:
+  - 0-50 pts: 🌱 Seedling
+  - 51-150 pts: 🌿 Sapling
+  - 151-300 pts: 🌳 Oak Tree
+  - 301+ pts: 🏆 Sustainability Champion
+
+- **Local Leaderboard**: Top 10 users in your area
+
+### 6. **Eco-Impact Dashboard**
+Display on user profile:
+- **Total CO₂ Saved**: `(Items borrowed × avg manufacturing footprint)`
+- **Money Saved**: `(Rental cost vs. purchase price)`
+- **Items Shared**: Simple counter
+- **Visual**: Progress bar or "forest" with growing trees
+
+---
+
+## 🚀 MVP Tech Stack Recommendation
+
+### **Frontend**
+- **React** + **Tailwind CSS** (fast UI development)
+- **Mapbox GL JS** or **Google Maps API**
+- **React Router** for navigation
+
+### **Backend**
+- **Node.js + Express** (simple REST API)
+- **PostgreSQL** or **MongoDB** (for user/item data)
+- **Firebase** (for real-time chat & notifications)
+
+### **Key Integrations**
+1. **Authentication**: Firebase Auth or Auth0
+2. **Maps**: Google Maps API (free tier: 28k requests/month)
+3. **AI Image Recognition**: 
+   - Gemini Vision API (free tier available)
+   - Or OpenAI GPT-4 Vision
+4. **QR Code**: `qrcode.react` library
+5. **File Upload**: Cloudinary or AWS S3
+
+### **Optional (For Bonus Points)**
+- **Web3 Escrow**: Simple smart contract on Polygon (low gas fees)
+- **Push Notifications**: Firebase Cloud Messaging
+
+---
+
+## 🎪 Hackathon "Wow" Features
+
+### 1. **Geo-Fencing Notifications** 🔔
+- When user enters a 1km zone with 5+ available items:
+  - Push notification: *"5 tools available in your area!"*
+- Implementation: Use Geolocation API + background service
+
+### 2. **AI Price/Impact Predictor**
+- When borrowing: *"By borrowing this drill instead of buying, you saved 15kg CO₂ and ₹2,500"*
+- Hardcoded logic for MVP:
+  ```
+  CO₂ saved = Item manufacturing footprint × 0.7
+  Money saved = Market price - Rental cost
+  ```
+
+### 3. **Emergency "Beacon" Feature** 🚨
+- User posts urgent need: *"Need jump-start cables NOW!"*
+- Sends notification to all users within 500m
+- First responder gets bonus eco-points
+
+### 4. **Auction Mode** 🏷️
+- For rare/antique items
+- Simple bidding system
+- Timer countdown (24/48 hours)
+
+---
+
+## 📐 Database Schema (Simplified)
+
+### **Users Table**
+```
+- id (UUID)
+- name
+- email
+- location (lat, lng, address)
+- trust_score (0-100)
+- eco_points
+- level (enum: seedling, sapling, oak, champion)
+- created_at
+```
+
+### **Items Table**
+```
+- id
+- owner_id (foreign key → Users)
+- title
+- description
+- category
+- type (lend/rent/sell/auction)
+- price (nullable)
+- status (available/in-use/unavailable)
+- location (lat, lng)
+- image_url
+- condition_photo_url
+- created_at
+```
+
+### **Transactions Table**
+```
+- id
+- item_id (foreign key)
+- borrower_id (foreign key)
+- lender_id (foreign key)
+- pickup_time
+- return_time
+- status (requested/active/completed/disputed)
+- qr_code_hash
+- rating_lender (1-5)
+- rating_borrower (1-5)
+- eco_impact_co2
+- eco_impact_money
+```
+
+---
+
+## 🛠️ MVP Development Phases (48-Hour Hackathon Plan)
+
+### **Hour 0-8: Setup & Core Infrastructure**
+- Set up React app + backend
+- Implement authentication
+- Database setup
+- Basic routing
+
+### **Hour 8-20: Map & Listing**
+- Integrate map with dummy pins
+- Build item listing form
+- Connect to database
+- Test CRUD operations
+
+### **Hour 20-32: Transaction Flow**
+- QR code generation
+- Chat system (use Firebase for speed)
+- Request/Accept flow
+- Status updates
+
+### **Hour 32-40: Gamification & Polish**
+- Eco-points calculation
+- Leaderboard
+- Impact dashboard
+- UI/UX refinements
+
+### **Hour 40-48: Hackathon Features & Demo**
+- Geo-fencing notifications
+- AI image recognition (if time permits)
+- Prepare demo script
+- Deploy on Vercel/Netlify
+
+---
+
+## 🎬 Demo Flow (5-Minute Pitch)
+
+1. **Hook (30s)**: "Did you know the average drill is used for only 13 minutes in its lifetime?"
+2. **Problem (1m)**: Show cluttered garage, wasted money, environmental impact
+3. **Solution (2m)**: Live demo:
+   - Open map → See nearby drill
+   - Request item → Quick chat
+   - Scan QR → Pickup
+   - Impact screen: "You saved 15kg CO₂!"
+4. **Features (1m)**: Show gamification, leaderboard, beacon feature
+5. **Call to Action (30s)**: "Join the sharing economy. Build community. Save the planet."
+
+---
+
+## 🎯 Success Metrics (To Track)
+
+- Users registered
+- Items listed
+- Successful transactions
+- Avg. trust score
+- Total CO₂ saved (calculated)
+- User engagement (daily active users)
+
+---
+
+## 🚧 Post-MVP Features (Future Roadmap)
+
+- **Smart Contracts**: Escrow for high-value items
+- **Insurance Integration**: Damage protection
+- **Delivery Option**: Partner with local delivery services
+- **Community Hubs**: Physical "EcoSync Stations" in neighborhoods
+- **Mobile App**: Native iOS/Android
+- **Subscription Tiers**: Premium features for power users
+
+---
+
+## 💡 Key Differentiators
+
+1. **Hyperlocal Focus**: Unlike Facebook Marketplace, this is neighborhood-first
+2. **Gamification**: Makes sustainability fun and competitive
+3. **Trust System**: Reputation scores reduce fraud
+4. **Environmental Impact**: Makes users feel good about sharing
+5. **Emergency Beacon**: Solves urgent needs instantly
+
+---
+
+**Good luck with your hackathon! Focus on getting the map + listing + transaction flow working perfectly. Everything else is a bonus. 🚀**
