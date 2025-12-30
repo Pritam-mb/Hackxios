@@ -632,6 +632,14 @@ Please read our [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our code 
 
 Built with passion during the hackathon by developers committed to creating sustainable technology solutions that strengthen communities and reduce environmental impact.
 
+### 🌟 Contributors
+
+<a href="https://github.com/Pritam-mb/Hackxios/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Pritam-mb/Hackxios" alt="Contributors" />
+</a>
+
+<br><br>
+
 **Special Thanks:**
 - 💻 **Kiro IDE** — For the powerful development environment that accelerated our workflow
 - 🌱 **Hackathon Organizers** — For creating this opportunity to build impactful solutions
