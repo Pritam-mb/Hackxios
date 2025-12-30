@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -54,14 +55,10 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async (authToken = token) => {
     try {
       console.log('AuthContext: Fetching user with token');
-      const response = await fetch('http://localhost:5000/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
-      });
+      // Use authAPI instead of direct fetch
+      const data = await authAPI.getMe();
 
-      if (response.ok) {
-        const data = await response.json();
+      if (data && data.user) {
         console.log('AuthContext: User fetched successfully', data.user);
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -80,17 +77,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
+      // Use authAPI instead of direct fetch
+      const data = await authAPI.login(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data && data.token) {
         // Store token and user in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -103,27 +93,20 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         return { success: true };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, message: 'Network error. Please try again.' };
+      return { success: false, message: error.message || 'Network error. Please try again.' };
     }
   };
 
   const register = async (name, email, password, coordinates) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, email, password, coordinates })
-      });
+      // Use authAPI instead of direct fetch
+      const data = await authAPI.register(name, email, password, coordinates);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data && data.token) {
         // Store token and user in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -136,11 +119,11 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         return { success: true };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Registration failed' };
       }
     } catch (error) {
       console.error('Register error:', error);
-      return { success: false, message: 'Network error. Please try again.' };
+      return { success: false, message: error.message || 'Network error. Please try again.' };
     }
   };
 
