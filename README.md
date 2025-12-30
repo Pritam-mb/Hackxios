@@ -23,21 +23,29 @@
 
 <br>
 
-```text
-╔══════════════════════════════════════╗
-║  PROJECT: EcoSync 🌱                 ║
-║  TYPE: Hyperlocal P2P Marketplace    ║
-║  MISSION: Sustainable Communities    ║
-║  STATUS: Hackathon Submission        ║
-║  DEVELOPED WITH: Kiro IDE            ║
-║  LICENSE: ISC                        ║
-╚══════════════════════════════════════╝
-   
-🎯 MISSION OBJECTIVES:
-   └─ Foster Community Trust & Connection
-   └─ Reduce Waste Through Sharing Economy
-   └─ Enable Hyperlocal Item Discovery
-   └─ Build Sustainable Neighborhoods
+```mermaid
+graph TD
+    EcoSync[EcoSync 🌱]
+    
+    Type[Hyperlocal P2P Marketplace]
+    Mission[Sustainable Communities]
+    Status[Hackathon Submission]
+    Dev[Developed With Kiro IDE]
+    License[ISC License]
+
+    EcoSync --> Type
+    EcoSync --> Mission
+    EcoSync --> Status
+    EcoSync --> Dev
+    EcoSync --> License
+
+    Mission --> Obj1[Foster Community Trust & Connection]
+    Mission --> Obj2[Reduce Waste Through Sharing Economy]
+    Mission --> Obj3[Enable Hyperlocal Item Discovery]
+    Mission --> Obj4[Build Sustainable Neighborhoods]
+    
+    style EcoSync fill:#00FF9C,color:black
+    style Mission fill:#47A248,color:white
 ```
 
 ## 🌍 EcoSync — Connecting Communities, One Item at a Time
