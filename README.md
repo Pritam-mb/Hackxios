@@ -14,7 +14,9 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Built with Kiro](https://img.shields.io/badge/Built_with-Kiro_IDE-FF6B6B?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://kiro.dev/)
+<a href="https://kiro.dev/">
+  <img src="assets/kiro-icon.svg" height="28" alt="Built with Kiro IDE" />
+</a>
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](https://opensource.org/licenses/ISC)
 
 </div>
@@ -186,7 +188,7 @@ Mobile-first architecture ensures seamless experience across all devices, from s
 ## 💻 Development Environment
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="100">
+  <img src="assets/kiro-icon.svg" width="100" alt="Kiro IDE">
 </div>
 
 ### Built with Kiro IDE
