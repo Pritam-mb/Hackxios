@@ -1,29 +1,11 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "cd ecosyc/ecosync-app && npm install && npm run build",
+  "outputDirectory": "ecosyc/ecosync-app/dist",
+  "rewrites": [
     {
-      "src": "ecosyc/ecosync-backend/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "ecosyc/ecosync-app/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "ecosyc/ecosync-app/dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "ecosyc/ecosync-backend/server.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "ecosyc/ecosync-app/dist/index.html"
+      "source": "/api/(.*)",
+      "destination": "/api"
     }
   ]
 }

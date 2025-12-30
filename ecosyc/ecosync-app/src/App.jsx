@@ -1,9 +1,9 @@
 import './App.css';
 import LandingPage from './pages/LandingPage';
-import Items from './pages/Items';
+import Items from './pages/items';
 import About from './pages/about';
 import ItemDetail from './pages/ItemDetail';
-import ListItem from './pages/ListItem';
+import ListItem from './pages/listItem';
 import Profile from './pages/profile';
 import RequestMap from './pages/RequestMap';
 import Login from './pages/Login';

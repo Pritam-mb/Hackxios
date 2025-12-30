@@ -29,7 +29,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({ message: '🌱 EcoSync API is running!' });
+  res.json({ 
+    message: '🌱 EcoSync API is running!',
+    status: 'active',
+    version: '1.0.0'
+  });
 });
 
 app.use('/api/auth', authRoutes);
@@ -47,7 +51,8 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'production') {
+// Only start server in development (not on Vercel)
+if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
