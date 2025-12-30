@@ -3,11 +3,12 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 let genAI;
 
 export const initializeGemini = () => {
-  if (!process.env.GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (!apiKey) {
     console.warn('⚠️ GEMINI_API_KEY not found in environment variables');
     return null;
   }
-  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  genAI = new GoogleGenerativeAI(apiKey);
   console.log('✅ Gemini AI initialized');
   return genAI;
 };
@@ -18,7 +19,7 @@ export const generateRecommendations = async (userProfile, userItems, userTransa
     if (!genAI) initializeGemini();
     if (!genAI) return null;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 You are an AI assistant for EcoSync, a peer-to-peer sharing platform. Analyze this user's profile and suggest 5 items they might want to borrow or lend.
@@ -202,9 +203,17 @@ Create 3 unique badge names with emoji and description. Be creative and specific
 export const getChatbotResponse = async (userMessage, context = {}) => {
   try {
     if (!genAI) initializeGemini();
-    if (!genAI) return "I'm currently unavailable. Please try again later.";
+    if (!genAI) return "I'm currently unavailable. Please check the system configuration.";
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash',
+      safetySettings: [
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+      ]
+    });
 
     const prompt = `
 You are EcoBot, a helpful assistant for EcoSync - a peer-to-peer sharing platform for tools and items.
@@ -224,7 +233,7 @@ Provide a helpful, friendly response. Keep it concise (2-3 sentences). If they a
     return response.text().trim();
   } catch (error) {
     console.error('Error getting chatbot response:', error);
-    return "I'm having trouble responding right now. Please try again.";
+    return "I'm having trouble connecting to my brain right now. Please try again in a moment.";
   }
 };
 

@@ -273,10 +273,11 @@ const RequestMap = () => {
             
             <button
               onClick={getCurrentLocation}
-              className="pointer-events-auto bg-white hover:bg-[#FAF8F5] text-[#1B4332] p-3 rounded-2xl shadow-lg border border-[#E8E3DB] transition-all hover:-translate-y-1 flex items-center justify-center w-12 h-12 self-end"
+              className="pointer-events-auto px-5 py-3 bg-white hover:bg-[#FAF8F5] text-[#1B4332] font-bold rounded-2xl shadow-lg border border-[#E8E3DB] transition-all hover:-translate-y-1 flex items-center gap-2"
               title="My Location"
             >
               <Icon icon="heroicons:map-pin" className="text-xl" />
+              <span className="hidden sm:inline">My Location</span>
             </button>
           </div>
 
@@ -522,7 +523,7 @@ const RequestMap = () => {
                     onClick={getCurrentLocation}
                     className="px-4 py-2 bg-white border border-[#E8E3DB] hover:border-[#1B4332] text-[#1B4332] text-xs font-bold rounded-lg transition-all shadow-sm"
                   >
-                    Update
+                    Detect Location
                   </button>
                 </div>
 

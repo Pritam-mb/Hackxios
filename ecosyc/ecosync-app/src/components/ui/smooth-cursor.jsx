@@ -77,7 +77,7 @@ export function SmoothCursor({
 
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-9999 mix-blend-difference"
+      className="fixed top-0 left-0 pointer-events-none z-[10001] mix-blend-difference"
       style={{
         x: cursorXSpring,
         y: cursorYSpring,
