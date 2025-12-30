@@ -61,16 +61,20 @@ const RequestMap = () => {
   const fetchRequests = async () => {
     try {
       const data = await requestsAPI.getAll();
+      if (!Array.isArray(data)) return;
+      
       // Convert MongoDB coordinates [lng, lat] to Leaflet [lat, lng]
-      const formattedRequests = data.map(req => ({
-        id: req._id,
-        item: req.itemName,
-        user: req.user?.name || 'Anonymous',
-        coords: [req.location.coordinates[1], req.location.coordinates[0]],
-        urgency: req.urgency,
-        description: req.description,
-        type: 'request'
-      }));
+      const formattedRequests = data
+        .filter(req => req.location && req.location.coordinates && req.location.coordinates.length === 2)
+        .map(req => ({
+          id: req._id,
+          item: req.itemName,
+          user: req.user?.name || 'Anonymous',
+          coords: [req.location.coordinates[1], req.location.coordinates[0]],
+          urgency: req.urgency,
+          description: req.description,
+          type: 'request'
+        }));
       setRequests(formattedRequests);
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -80,20 +84,24 @@ const RequestMap = () => {
   const fetchItems = async () => {
     try {
       const data = await itemsAPI.getAll();
+      if (!Array.isArray(data)) return;
+
       // Convert MongoDB coordinates [lng, lat] to Leaflet [lat, lng]
-      const formattedItems = data.map(item => ({
-        id: item._id,
-        title: item.title,
-        description: item.description,
-        owner: item.owner?.name || 'Anonymous',
-        coords: [item.location.coordinates[1], item.location.coordinates[0]],
-        category: item.category,
-        type: item.type,
-        price: item.price,
-        status: item.status,
-        imageUrl: item.imageUrl,
-        itemType: 'item'
-      }));
+      const formattedItems = data
+        .filter(item => item.location && item.location.coordinates && item.location.coordinates.length === 2)
+        .map(item => ({
+          id: item._id,
+          title: item.title,
+          description: item.description,
+          owner: item.owner?.name || 'Anonymous',
+          coords: [item.location.coordinates[1], item.location.coordinates[0]],
+          category: item.category,
+          type: item.type,
+          price: item.price,
+          status: item.status,
+          imageUrl: item.imageUrl,
+          itemType: 'item'
+        }));
       setItems(formattedItems);
     } catch (error) {
       console.error('Error fetching items:', error);
