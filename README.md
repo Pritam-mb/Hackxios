@@ -83,6 +83,13 @@ Mobile-first architecture ensures seamless experience across all devices, from s
 ## 🛠️ Technology Stack
 
 ### Frontend (`ecosync-app`)
+
+<p align="left">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=react,vite,tailwind,js,html,css" />
+  </a>
+</p>
+
 | Tech | Description |
 | --- | --- |
 | **React 19** | Modern UI library for building interactive interfaces |
@@ -93,6 +100,13 @@ Mobile-first architecture ensures seamless experience across all devices, from s
 | **React Router DOM** | Declarative routing for React applications |
 
 ### Backend (`ecosync-backend`)
+
+<p align="left">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=nodejs,express,mongodb" />
+  </a>
+</p>
+
 | Tech | Description |
 | --- | --- |
 | **Node.js** | JavaScript runtime built on Chrome's V8 engine |
