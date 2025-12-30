@@ -84,14 +84,16 @@ Mobile-first architecture ensures seamless experience across all devices, from s
 
 ### Frontend (`ecosync-app`)
 
-<p align="left">
+<div align="center">
   <a href="https://skillicons.dev">
     <img src="https://skillicons.dev/icons?i=react,vite,tailwind,js,html,css" />
   </a>
-</p>
+</div>
+
+<div align="center">
 
 | Tech | Description |
-| --- | --- |
+| :--- | :--- |
 | **React 19** | Modern UI library for building interactive interfaces |
 | **Vite** | Next-generation frontend tooling for lightning-fast builds |
 | **Tailwind CSS 4** | Utility-first CSS framework for rapid UI development |
@@ -99,22 +101,54 @@ Mobile-first architecture ensures seamless experience across all devices, from s
 | **Leaflet & React Leaflet** | Mobile-friendly interactive maps |
 | **React Router DOM** | Declarative routing for React applications |
 
+</div>
+
 ### Backend (`ecosync-backend`)
 
-<p align="left">
+<div align="center">
   <a href="https://skillicons.dev">
     <img src="https://skillicons.dev/icons?i=nodejs,express,mongodb" />
   </a>
-</p>
+</div>
+
+<div align="center">
 
 | Tech | Description |
-| --- | --- |
+| :--- | :--- |
 | **Node.js** | JavaScript runtime built on Chrome's V8 engine |
 | **Express.js** | Fast, unopinionated, minimalist web framework for Node.js |
 | **MongoDB** | NoSQL database for flexible and scalable data storage |
 | **Mongoose** | Elegant MongoDB object modeling for Node.js |
 | **JWT** | JSON Web Tokens for secure authentication |
 | **Bcrypt.js** | Library to help you hash passwords |
+
+</div>
+
+---
+
+## 💡 Inspiration
+
+The idea for **EcoSync** was born from a simple observation: our neighborhoods are full of underutilized resources. We realized that while one neighbor might need a drill for a 10-minute job, another neighbor has one gathering dust in their garage. We wanted to bridge this gap, fostering a sense of community while promoting sustainability.
+
+## 🧠 Challenges We Ran Into
+
+Building a hyperlocal marketplace came with its own set of unique challenges:
+
+- **Geospatial Queries**: Implementing efficient location-based search using MongoDB's geospatial operators was tricky, especially when handling edge cases like users with no location data.
+- **Real-time State Management**: Keeping the map state synchronized with the list view and ensuring that item availability updated in real-time required careful state management in React.
+- **Trust & Safety**: Designing a trust score system that felt fair but robust against manipulation was a complex logic problem that required several iterations.
+
+## 🏅 Accomplishments That We're Proud Of
+
+- **Seamless Map Integration**: We successfully integrated Leaflet maps to provide a smooth, interactive discovery experience that feels native.
+- **Robust Authentication**: Implementing a secure JWT-based auth system from scratch gave us a deep understanding of web security.
+- **Clean UI/UX**: We're particularly proud of the clean, modern interface built with Tailwind CSS that makes the complex process of borrowing and lending feel simple.
+
+## 📚 What We Learned
+
+- **Full-Stack Integration**: Connecting a React frontend with an Express backend and ensuring smooth data flow taught us a lot about RESTful API design.
+- **Database Design**: Structuring our MongoDB schemas to handle relationships between Users, Items, Requests, and Transactions was a great lesson in NoSQL data modeling.
+- **Team Collaboration**: Working together on a complex project under time constraints helped us refine our git workflow and communication skills.
 
 ---
 
