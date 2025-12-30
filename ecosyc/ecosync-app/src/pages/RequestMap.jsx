@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { requestsAPI, itemsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import BackgroundLayout from '../components/BackgroundLayout';
 import { Icon } from '@iconify/react';
 
@@ -24,6 +25,7 @@ const itemIcon = new L.Icon({
 
 const RequestMap = () => {
   const { user } = useAuth();
+  const notify = useNotification();
   const [requests, setRequests] = useState([]);
   const [items, setItems] = useState([]);
   const [newRequestCoords, setNewRequestCoords] = useState(null);
@@ -36,6 +38,9 @@ const RequestMap = () => {
   });
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [offerMessage, setOfferMessage] = useState('');
   const mapRef = useRef();
 
   // Fetch all requests and items on mount
@@ -43,6 +48,13 @@ const RequestMap = () => {
     fetchRequests();
     fetchItems();
   }, []);
+
+  // Check for matching items when requests are loaded
+  useEffect(() => {
+    if (requests.length > 0 && items.length > 0) {
+      checkForMatches();
+    }
+  }, [requests, items]);
 
   const fetchRequests = async () => {
     try {
@@ -84,6 +96,24 @@ const RequestMap = () => {
     } catch (error) {
       console.error('Error fetching items:', error);
     }
+  };
+
+  // Check if any items match pending requests
+  const checkForMatches = () => {
+    requests.forEach(request => {
+      const matchingItems = items.filter(item => 
+        item.status === 'available' && 
+        item.title.toLowerCase().includes(request.item.toLowerCase())
+      );
+
+      if (matchingItems.length > 0) {
+        const itemNames = matchingItems.map(i => i.title).join(', ');
+        notify.info(
+          `🎉 Good news! ${matchingItems.length} item(s) matching "${request.item}" are available: ${itemNames}`,
+          8000
+        );
+      }
+    });
   };
 
   // Get user's current location
@@ -143,12 +173,42 @@ const RequestMap = () => {
       setNewRequestCoords(null);
       setFormData({ itemName: "", description: "", urgency: "normal" });
       setShowRequestForm(false);
-      alert('🚨 Request raised successfully!');
+      notify.success('🚨 Request raised successfully! Your neighbors will be notified.');
     } catch (error) {
       console.error('Error creating request:', error);
-      alert('Failed to create request. Please try again.');
+      notify.error('Failed to create request. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOfferHelp = (request) => {
+    if (!user) {
+      notify.warning('Please login to offer help!');
+      return;
+    }
+    setSelectedRequest(request);
+    setOfferMessage(`Hi! I have a ${request.item} that you can borrow. Let me know when you'd like to pick it up!`);
+    setShowOfferModal(true);
+  };
+
+  const handleSendOffer = async () => {
+    try {
+      // In a real app, this would send a message/notification to the requester
+      // For now, we'll just show a success message
+      console.log('Sending offer:', {
+        requestId: selectedRequest.id,
+        helper: user.name,
+        message: offerMessage
+      });
+      
+      notify.success(`✅ Your offer has been sent to ${selectedRequest.user}! They will contact you soon.`);
+      setShowOfferModal(false);
+      setSelectedRequest(null);
+      setOfferMessage('');
+    } catch (error) {
+      console.error('Error sending offer:', error);
+      notify.error('Failed to send offer. Please try again.');
     }
   };
 
@@ -243,7 +303,10 @@ const RequestMap = () => {
                       <p className="text-xs text-[#9B9486] mb-2">{req.description}</p>
                     )}
                     <p className="text-xs text-[#9B9486] mb-3">Requested by {req.user}</p>
-                    <button className="w-full bg-[#E63946] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#D62828] transition-colors">
+                    <button 
+                      onClick={() => handleOfferHelp(req)}
+                      className="w-full bg-[#E63946] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#D62828] transition-colors"
+                    >
                       I have this!
                     </button>
                   </div>
@@ -417,6 +480,59 @@ const RequestMap = () => {
                   {loading ? 'Creating...' : 'Raise Beacon'}
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Offer Help Modal */}
+        {showOfferModal && selectedRequest && (
+          <div className="fixed inset-0 bg-[#1B4332]/20 backdrop-blur-sm z-2000 flex items-center justify-center p-4">
+            <div className="bg-white border border-[#E8E3DB] rounded-[32px] p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-[#1B4332]" style={{ fontFamily: "'Google Sans', sans-serif" }}>Offer Help</h3>
+                <button
+                  onClick={() => setShowOfferModal(false)}
+                  className="w-8 h-8 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#4A453E] hover:bg-[#E8E3DB] transition-colors"
+                >
+                  <Icon icon="heroicons:x-mark" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="bg-[#FAF8F5] rounded-xl p-4 mb-4">
+                  <p className="text-sm text-[#4A453E] mb-1">Request from:</p>
+                  <p className="font-bold text-[#1B4332] text-lg">{selectedRequest.user}</p>
+                  <p className="text-sm text-[#4A453E] mt-2">Looking for: <span className="font-semibold text-[#1B4332]">{selectedRequest.item}</span></p>
+                  {selectedRequest.description && (
+                    <p className="text-xs text-[#9B9486] mt-2">{selectedRequest.description}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#1B4332] mb-2 ml-1">Your Message</label>
+                  <textarea
+                    value={offerMessage}
+                    onChange={(e) => setOfferMessage(e.target.value)}
+                    placeholder="Let them know you can help..."
+                    className="w-full bg-[#FAF8F5] border border-[#E8E3DB] rounded-xl px-4 py-3 text-[#1B4332] placeholder-[#4A453E]/40 focus:outline-none focus:border-[#1B4332] focus:ring-1 focus:ring-[#1B4332] transition-all h-32 resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowOfferModal(false)}
+                  className="flex-1 py-3 bg-white border-2 border-[#E8E3DB] hover:border-[#1B4332] text-[#1B4332] font-bold rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendOffer}
+                  className="flex-1 py-3 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#2D6A4F]/20"
+                >
+                  Send Offer
+                </button>
+              </div>
             </div>
           </div>
         )}

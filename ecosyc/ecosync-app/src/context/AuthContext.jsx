@@ -12,46 +12,41 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  // Initialize user from localStorage immediately
-  const storedUser = localStorage.getItem('user');
-  const storedToken = localStorage.getItem('token');
-  
-  const [user, setUser] = useState(() => {
+  // Initialize user from localStorage SYNCHRONOUSLY
+  const getStoredUser = () => {
     try {
+      const storedUser = localStorage.getItem('user');
       return storedUser ? JSON.parse(storedUser) : null;
     } catch {
       return null;
     }
-  });
-  const [token, setToken] = useState(storedToken);
-  const [loading, setLoading] = useState(!!storedToken); // Only load if we have a token to verify
+  };
+
+  const getStoredToken = () => {
+    return localStorage.getItem('token');
+  };
+
+  const [user, setUser] = useState(getStoredUser());
+  const [token, setToken] = useState(getStoredToken());
+  const [loading, setLoading] = useState(false);
+
+  // Log initial state
+  useEffect(() => {
+    console.log('🔐 AuthContext initialized:', { 
+      hasUser: !!user, 
+      hasToken: !!token,
+      userName: user?.name 
+    });
+  }, []);
 
   useEffect(() => {
-    // Check if user is logged in on mount
+    // Only verify token if we have one
     const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
     
-    console.log('AuthContext: Checking stored credentials', { 
-      hasToken: !!storedToken, 
-      hasUser: !!storedUser 
-    });
-    
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsedUser);
-        console.log('AuthContext: User loaded from localStorage', parsedUser);
-        // Verify token is still valid
-        fetchUser(storedToken);
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        logout();
-      }
-    } else if (storedToken) {
+    if (storedToken && !user) {
+      // We have a token but no user, fetch user data
+      setLoading(true);
       fetchUser(storedToken);
-    } else {
-      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -189,13 +184,6 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated: !!user
   };
-
-  console.log('AuthContext: Current state', { 
-    hasUser: !!user, 
-    hasToken: !!token, 
-    loading, 
-    isAuthenticated: !!user 
-  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

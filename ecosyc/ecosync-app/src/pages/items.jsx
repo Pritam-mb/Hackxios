@@ -120,14 +120,16 @@ const Items = () => {
                       <span className="text-sm font-medium text-[#4A453E]/80">{item.owner?.name || 'Anonymous'}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      {item.type === 'rent' && item.price > 0 && (
-                        <span className="text-[#1B4332] font-bold bg-[#B7E4C7]/30 px-3 py-1 rounded-full text-sm">${item.price}/day</span>
-                      )}
-                      {item.type === 'lend' && (
-                        <span className="text-[#1B4332] font-bold bg-[#B7E4C7]/30 px-3 py-1 rounded-full text-sm">Free</span>
-                      )}
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/order/${item._id}`);
+                      }}
+                      className="px-4 py-2 bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold rounded-lg transition-all flex items-center gap-2"
+                    >
+                      <Icon icon="heroicons:shopping-bag" width="18" />
+                      {item.type === 'rent' ? 'Rent' : 'Borrow'}
+                    </button>
                   </div>
                 </div>
               </SpotlightCard>

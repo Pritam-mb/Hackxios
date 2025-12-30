@@ -18,7 +18,7 @@ export const generateRecommendations = async (userProfile, userItems, userTransa
     if (!genAI) initializeGemini();
     if (!genAI) return null;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
 You are an AI assistant for EcoSync, a peer-to-peer sharing platform. Analyze this user's profile and suggest 5 items they might want to borrow or lend.

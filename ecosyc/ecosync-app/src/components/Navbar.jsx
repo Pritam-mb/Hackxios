@@ -1,15 +1,47 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { transactionsAPI } from '../services/api';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated, loading } = useAuth();
+  const [notificationCount, setNotificationCount] = useState(0);
   const isActive = (path) => location.pathname === path;
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchNotificationCount();
+      const interval = setInterval(fetchNotificationCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user]);
+
+  const fetchNotificationCount = async () => {
+    try {
+      const transactions = await transactionsAPI.getUserTransactions(user.id);
+      const pendingOrders = transactions.filter(
+        t => t.lender._id === user.id && t.status === 'requested'
+      );
+      setNotificationCount(pendingOrders.length);
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/items', label: 'Browse' },
+    { path: '/request-map', label: 'Explore Map' },
     { path: '/about', label: 'About' }
   ];
 
@@ -46,13 +78,57 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-3 pr-1">
-          <Link to="/login" className="hidden sm:block px-5 py-2.5 text-sm font-medium text-[#1B4332] hover:bg-[#FAF8F5] rounded-full transition-colors">
-            Log in
-          </Link>
-          <Link to="/register" className="px-5 py-2.5 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-sm font-medium rounded-full shadow-lg shadow-[#1B4332]/20 transition-all hover:shadow-xl hover:shadow-[#1B4332]/30 flex items-center gap-2 group">
-            <span>Get Started</span>
-            <Icon icon="heroicons:arrow-right" width="14" className="transition-transform group-hover:translate-x-1" />
-          </Link>
+          {loading ? (
+            <div className="text-[#4A453E]/60 text-sm px-5 py-2.5">Loading...</div>
+          ) : isAuthenticated ? (
+            <>
+              <Link 
+                to="/list" 
+                className="hidden sm:block px-5 py-2.5 text-sm font-medium text-[#1B4332] hover:bg-[#FAF8F5] rounded-full transition-colors"
+              >
+                + List Item
+              </Link>
+              
+              {/* Notification Bell */}
+              <Link 
+                to="/profile"
+                className="relative p-2 hover:bg-[#FAF8F5] rounded-full transition-colors"
+              >
+                <Icon icon="heroicons:bell" className="text-[#1B4332]" width="22" />
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {notificationCount}
+                  </span>
+                )}
+              </Link>
+
+              <Link 
+                to="/profile" 
+                className="flex items-center gap-2 px-4 py-2 bg-[#FAF8F5] hover:bg-[#E8E3DB] rounded-full transition-colors"
+              >
+                <div className="w-7 h-7 bg-[#1B4332] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  {user?.name?.[0]?.toUpperCase() || '?'}
+                </div>
+                <span className="text-sm font-medium text-[#1B4332] hidden sm:inline">{user?.name}</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2.5 text-sm font-medium text-[#4A453E] hover:text-[#1B4332] hover:bg-[#FAF8F5] rounded-full transition-colors"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:block px-5 py-2.5 text-sm font-medium text-[#1B4332] hover:bg-[#FAF8F5] rounded-full transition-colors">
+                Log in
+              </Link>
+              <Link to="/register" className="px-5 py-2.5 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-sm font-medium rounded-full shadow-lg shadow-[#1B4332]/20 transition-all hover:shadow-xl hover:shadow-[#1B4332]/30 flex items-center gap-2 group">
+                <span>Get Started</span>
+                <Icon icon="heroicons:arrow-right" width="14" className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
