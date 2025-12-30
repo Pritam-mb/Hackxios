@@ -9,25 +9,21 @@
       "src": "ecosyc/ecosync-app/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "ecosyc/ecosync-app/dist"
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/ecosyc/ecosync-backend/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/ecosyc/ecosync-app/$1"
+      "dest": "ecosyc/ecosync-backend/server.js"
     },
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/ecosyc/ecosync-app/index.html"
+      "dest": "ecosyc/ecosync-app/dist/index.html"
     }
   ]
 }
