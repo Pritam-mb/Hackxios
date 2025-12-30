@@ -1,6 +1,7 @@
-const API_BASE_URL = 'http://localhost:5000/api';
-
 // Helper to get auth headers
+// API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -209,6 +210,65 @@ export const usersAPI = {
       method: 'PATCH',
       headers: getAuthHeaders(),
       body: JSON.stringify({ points })
+    });
+    return handleResponse(response);
+  }
+};
+
+
+// AI API
+export const aiAPI = {
+  getRecommendations: async () => {
+    const response = await fetch(`${API_BASE_URL}/ai/recommendations`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  getEcoInsights: async () => {
+    const response = await fetch(`${API_BASE_URL}/ai/insights`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  getAchievementSummary: async () => {
+    const response = await fetch(`${API_BASE_URL}/ai/achievement-summary`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  analyzeImage: async (imageBase64) => {
+    const response = await fetch(`${API_BASE_URL}/ai/analyze-image`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ imageBase64 })
+    });
+    return handleResponse(response);
+  },
+  
+  getSmartBadges: async () => {
+    const response = await fetch(`${API_BASE_URL}/ai/smart-badges`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  chat: async (message) => {
+    const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ message })
+    });
+    return handleResponse(response);
+  },
+  
+  getProfileSuggestions: async (partialProfile) => {
+    const response = await fetch(`${API_BASE_URL}/ai/profile-suggestions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(partialProfile)
     });
     return handleResponse(response);
   }

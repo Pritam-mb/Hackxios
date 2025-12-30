@@ -1,16 +1,34 @@
 import { useState, useRef, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { requestsAPI } from '../services/api';
+import { requestsAPI, itemsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import BackgroundLayout from '../components/BackgroundLayout';
 import { Icon } from '@iconify/react';
 
+// Custom icons for different marker types
+const requestIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iNDIiIHZpZXdCb3g9IjAgMCAzMiA0MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEMxMC40NzcgMCA2IDQuNDc3IDYgMTBDNiAxNy41IDE2IDMwIDE2IDMwQzE2IDMwIDI2IDE3LjUgMjYgMTBDMjYgNC40NzcgMjEuNTIzIDAgMTYgMFoiIGZpbGw9IiNFNjM5NDYiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjEwIiByPSI1IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42]
+});
+
+const itemIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iNDIiIHZpZXdCb3g9IjAgMCAzMiA0MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEMxMC40NzcgMCA2IDQuNDc3IDYgMTBDNiAxNy41IDE2IDMwIDE2IDMwQzE2IDMwIDI2IDE3LjUgMjYgMTBDMjYgNC40NzcgMjEuNTIzIDAgMTYgMFoiIGZpbGw9IiMyRDZBNEYiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjEwIiByPSI1IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42]
+});
+
 const RequestMap = () => {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
+  const [items, setItems] = useState([]);
   const [newRequestCoords, setNewRequestCoords] = useState(null);
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [showFilter, setShowFilter] = useState({ requests: true, items: true });
   const [formData, setFormData] = useState({
     itemName: "",
     description: "",
@@ -20,9 +38,10 @@ const RequestMap = () => {
   const [loading, setLoading] = useState(false);
   const mapRef = useRef();
 
-  // Fetch all requests on mount
+  // Fetch all requests and items on mount
   useEffect(() => {
     fetchRequests();
+    fetchItems();
   }, []);
 
   const fetchRequests = async () => {
@@ -35,11 +54,35 @@ const RequestMap = () => {
         user: req.user?.name || 'Anonymous',
         coords: [req.location.coordinates[1], req.location.coordinates[0]],
         urgency: req.urgency,
-        description: req.description
+        description: req.description,
+        type: 'request'
       }));
       setRequests(formattedRequests);
     } catch (error) {
       console.error('Error fetching requests:', error);
+    }
+  };
+
+  const fetchItems = async () => {
+    try {
+      const data = await itemsAPI.getAll();
+      // Convert MongoDB coordinates [lng, lat] to Leaflet [lat, lng]
+      const formattedItems = data.map(item => ({
+        id: item._id,
+        title: item.title,
+        description: item.description,
+        owner: item.owner?.name || 'Anonymous',
+        coords: [item.location.coordinates[1], item.location.coordinates[0]],
+        category: item.category,
+        type: item.type,
+        price: item.price,
+        status: item.status,
+        imageUrl: item.imageUrl,
+        itemType: 'item'
+      }));
+      setItems(formattedItems);
+    } catch (error) {
+      console.error('Error fetching items:', error);
     }
   };
 
@@ -115,13 +158,32 @@ const RequestMap = () => {
         {/* Header */}
         <div className="p-6 bg-white/80 backdrop-blur-md border-b border-[#E8E3DB] flex justify-between items-center relative z-20">
           <div>
-            <h2 className="text-2xl font-bold text-[#1B4332]" style={{ fontFamily: "'Google Sans', sans-serif" }}>Community Beacons</h2>
-            <p className="text-[#4A453E]/60 text-sm">Click the map to set location, then raise your request</p>
+            <h2 className="text-2xl font-bold text-[#1B4332]" style={{ fontFamily: "'Google Sans', sans-serif" }}>Explore Map</h2>
+            <p className="text-[#4A453E]/60 text-sm">Discover items and requests in your community</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-[#B7E4C7]/30 text-[#1B4332] px-4 py-2 rounded-full text-sm font-bold border border-[#B7E4C7] flex items-center gap-2">
-              <span className="w-2 h-2 bg-[#2D6A4F] rounded-full animate-pulse"></span>
-              {requests.length} Active Requests
+            {/* Filter Toggles */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowFilter({ ...showFilter, items: !showFilter.items })}
+                className={`px-4 py-2 rounded-full text-sm font-bold border-2 transition-all ${
+                  showFilter.items 
+                    ? 'bg-[#2D6A4F] text-white border-[#2D6A4F]' 
+                    : 'bg-white text-[#2D6A4F] border-[#2D6A4F]'
+                }`}
+              >
+                📦 Items ({items.length})
+              </button>
+              <button
+                onClick={() => setShowFilter({ ...showFilter, requests: !showFilter.requests })}
+                className={`px-4 py-2 rounded-full text-sm font-bold border-2 transition-all ${
+                  showFilter.requests 
+                    ? 'bg-[#E63946] text-white border-[#E63946]' 
+                    : 'bg-white text-[#E63946] border-[#E63946]'
+                }`}
+              >
+                🚨 Requests ({requests.length})
+              </button>
             </div>
             <button
               onClick={() => setShowRequestForm(true)}
@@ -162,14 +224,65 @@ const RequestMap = () => {
             )}
 
             {/* Render Existing Requests */}
-            {requests.map(req => (
-              <Marker key={req.id} position={req.coords}>
+            {showFilter.requests && requests.map(req => (
+              <Marker key={req.id} position={req.coords} icon={requestIcon}>
                 <Popup>
-                  <div className="text-[#4A453E]">
-                    <p className="font-bold text-[#1B4332] mb-1">Neighbor needs: {req.item}</p>
+                  <div className="text-[#4A453E] min-w-[200px]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🚨</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        req.urgency === 'high' ? 'bg-red-100 text-red-700' :
+                        req.urgency === 'normal' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {req.urgency}
+                      </span>
+                    </div>
+                    <p className="font-bold text-[#1B4332] mb-1">Need: {req.item}</p>
+                    {req.description && (
+                      <p className="text-xs text-[#9B9486] mb-2">{req.description}</p>
+                    )}
                     <p className="text-xs text-[#9B9486] mb-3">Requested by {req.user}</p>
-                    <button className="w-full bg-[#1B4332] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#2D6A4F] transition-colors">
+                    <button className="w-full bg-[#E63946] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#D62828] transition-colors">
                       I have this!
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+
+            {/* Render Available Items */}
+            {showFilter.items && items.map(item => (
+              <Marker key={item.id} position={item.coords} icon={itemIcon}>
+                <Popup>
+                  <div className="text-[#4A453E] min-w-[200px]">
+                    {item.imageUrl && (
+                      <img 
+                        src={item.imageUrl} 
+                        alt={item.title} 
+                        className="w-full h-32 object-cover rounded-lg mb-2"
+                      />
+                    )}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">📦</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        item.status === 'available' ? 'bg-green-100 text-green-700' :
+                        item.status === 'in-use' ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </div>
+                    <p className="font-bold text-[#1B4332] mb-1">{item.title}</p>
+                    <p className="text-xs text-[#9B9486] mb-2 line-clamp-2">{item.description}</p>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs text-[#9B9486]">by {item.owner}</span>
+                      <span className="text-sm font-bold text-[#2D6A4F]">
+                        {item.type === 'lend' ? 'Free' : `₹${item.price}`}
+                      </span>
+                    </div>
+                    <button className="w-full bg-[#2D6A4F] text-white py-2 rounded-lg font-bold text-xs hover:bg-[#1B4332] transition-colors">
+                      {item.type === 'lend' ? 'Borrow' : item.type === 'rent' ? 'Rent' : 'View'}
                     </button>
                   </div>
                 </Popup>
@@ -194,10 +307,21 @@ const RequestMap = () => {
             )}
           </MapContainer>
 
-          {/* Legend / Tip */}
-          <div className="absolute bottom-10 left-10 z-1000 bg-white/90 p-4 rounded-2xl border border-[#E8E3DB] backdrop-blur-md max-w-xs shadow-xl">
-            <p className="text-xs text-[#4A453E] leading-relaxed">
-              <span className="text-[#1B4332] font-bold">Tip:</span> Beacons stay active for 24 hours. Once a neighbor offers help, you'll be notified in Chat.
+          {/* Legend */}
+          <div className="absolute bottom-10 left-10 z-1000 bg-white/90 p-4 rounded-2xl border border-[#E8E3DB] backdrop-blur-md shadow-xl">
+            <h4 className="text-sm font-bold text-[#1B4332] mb-3">Map Legend</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-[#2D6A4F] rounded-full"></div>
+                <span className="text-xs text-[#4A453E]">Available Items</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-[#E63946] rounded-full"></div>
+                <span className="text-xs text-[#4A453E]">Active Requests</span>
+              </div>
+            </div>
+            <p className="text-xs text-[#4A453E] leading-relaxed mt-3 pt-3 border-t border-[#E8E3DB]">
+              <span className="text-[#1B4332] font-bold">Tip:</span> Click markers to view details and take action
             </p>
           </div>
         </div>

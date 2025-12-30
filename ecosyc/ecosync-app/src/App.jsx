@@ -8,7 +8,7 @@ import Profile from './pages/profile';
 import RequestMap from './pages/RequestMap';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Header from './components/Header';
+import Chatbot from './components/Chatbot';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
@@ -27,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        <Chatbot />
       </Router>
     </AuthProvider>
   );

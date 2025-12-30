@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, loading } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -23,7 +23,7 @@ const Header = () => {
             Browse
           </Link>
           <Link to="/request-map" className="text-slate-300 hover:text-white transition-colors">
-            Requests
+            Explore Map
           </Link>
           <Link to="/about" className="text-slate-300 hover:text-white transition-colors">
             About
@@ -31,7 +31,9 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          {isAuthenticated ? (
+          {loading ? (
+            <div className="text-slate-400">Loading...</div>
+          ) : isAuthenticated ? (
             <>
               <Link
                 to="/list"
@@ -43,8 +45,8 @@ const Header = () => {
                 to="/profile"
                 className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-all"
               >
-                <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-sm text-green-400">
-                  {user?.name?.[0] || '?'}
+                <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-sm text-green-400 font-bold">
+                  {user?.name?.[0]?.toUpperCase() || '?'}
                 </div>
                 <span className="text-white text-sm">{user?.name}</span>
               </Link>

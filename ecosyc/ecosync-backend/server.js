@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import { initializeGemini } from './services/geminiService.js';
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
@@ -9,6 +10,7 @@ import userRoutes from './routes/userRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 dotenv.config();
 
@@ -17,10 +19,13 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Initialize Gemini AI
+initializeGemini();
+
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // Increased for image uploads
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Routes
 app.get('/', (req, res) => {
@@ -32,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
