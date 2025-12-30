@@ -228,11 +228,36 @@ User message: "${userMessage}"
 Provide a helpful, friendly response. Keep it concise (2-3 sentences). If they ask about features, explain how EcoSync works. If they need help, guide them step by step.
 `;
 
-    const result = await model.generateContent(prompt);
+    let result;
+    try {
+      result = await model.generateContent(prompt);
+    } catch (firstError) {
+      // Simple retry logic for rate limits
+      if (firstError.message.includes('429') || firstError.message.includes('Quota')) {
+        console.log('⚠️ Rate limit hit. Waiting 4s before one retry...');
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        result = await model.generateContent(prompt);
+      } else {
+        throw firstError;
+      }
+    }
+
     const response = await result.response;
     return response.text().trim();
   } catch (error) {
     console.error('Error getting chatbot response:', error);
+    
+    // Handle specific error cases
+    if (error.message.includes('429') || error.message.includes('Quota')) {
+      return "I'm receiving too many messages right now (Rate Limit Exceeded). Please try again in a minute.";
+    }
+    if (error.message.includes('403') || error.message.includes('Forbidden')) {
+      return "Access denied (403). The API key might be invalid, restricted, or temporarily blocked due to excessive traffic.";
+    }
+    if (error.message.includes('404') || error.message.includes('not found')) {
+      return "My AI model (gemini-2.5-flash) is currently unavailable or invalid. Please contact support.";
+    }
+    
     return "I'm having trouble connecting to my brain right now. Please try again in a moment.";
   }
 };
