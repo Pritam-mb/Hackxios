@@ -56,6 +56,13 @@ graph TD
 
 ---
 
+## 📢 Social Media Submission
+
+We shared our **Hackxios25** journey and experience building with **Kiro IDE** on LinkedIn! 
+
+🔗 **[View Official LinkedIn Post](https://www.linkedin.com/posts/isoumyadeyy_hackxios-kiroide-onlinehackathon-activity-7411856716461441024-sGvj?utm_source=share&utm_medium=member_android&rcm=ACoAAENZiRABOduBuAI3eDnyEYbdPzG7SKhWfpA)**
+
+
 ## 📖 Table of Contents
 
 - [Mission Snapshot](#-mission-snapshot)
