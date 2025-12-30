@@ -14,24 +14,24 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const transactions = await transactionsAPI.getUserTransactions(user.id);
+        const pendingOrders = transactions.filter(
+          t => t.lender._id === user.id && t.status === 'requested'
+        );
+        setNotificationCount(pendingOrders.length);
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
+      }
+    };
+
     if (isAuthenticated && user) {
       fetchNotificationCount();
       const interval = setInterval(fetchNotificationCount, 30000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, user]);
-
-  const fetchNotificationCount = async () => {
-    try {
-      const transactions = await transactionsAPI.getUserTransactions(user.id);
-      const pendingOrders = transactions.filter(
-        t => t.lender._id === user.id && t.status === 'requested'
-      );
-      setNotificationCount(pendingOrders.length);
-    } catch (error) {
-      console.error('Error fetching notification count:', error);
-    }
-  };
 
   const handleLogout = () => {
     logout();

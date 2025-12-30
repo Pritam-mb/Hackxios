@@ -12,6 +12,48 @@ const Header = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        // Fetch pending orders (where user is the lender)
+        const transactions = await transactionsAPI.getUserTransactions(user.id);
+        const pendingOrders = transactions.filter(
+          t => t.lender._id === user.id && t.status === 'requested'
+        );
+
+        // Fetch user's requests to see if anyone offered help
+        // In a real app, you'd have a separate endpoint for offers
+        const userRequests = await requestsAPI.getAll();
+        const myRequests = userRequests.filter(r => r.user?._id === user.id);
+
+        const notifs = [
+          ...pendingOrders.map(order => ({
+            id: order._id,
+            type: 'order',
+            title: 'New Order Request',
+            message: `${order.borrower?.name} wants to borrow your ${order.item?.title}`,
+            time: new Date(order.createdAt),
+            link: '/profile'
+          })),
+          ...myRequests.map(req => ({
+            id: req._id,
+            type: 'request',
+            title: 'Your Request',
+            message: `Looking for: ${req.itemName}`,
+            time: new Date(req.createdAt),
+            link: '/request-map'
+          }))
+        ];
+
+        // Sort by time, most recent first
+        notifs.sort((a, b) => b.time - a.time);
+        
+        setNotifications(notifs.slice(0, 5)); // Show only 5 most recent
+        setNotificationCount(pendingOrders.length); // Only count pending orders
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
     if (isAuthenticated && user) {
       fetchNotifications();
       // Refresh notifications every 30 seconds
@@ -19,48 +61,6 @@ const Header = () => {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, user]);
-
-  const fetchNotifications = async () => {
-    try {
-      // Fetch pending orders (where user is the lender)
-      const transactions = await transactionsAPI.getUserTransactions(user.id);
-      const pendingOrders = transactions.filter(
-        t => t.lender._id === user.id && t.status === 'requested'
-      );
-
-      // Fetch user's requests to see if anyone offered help
-      // In a real app, you'd have a separate endpoint for offers
-      const userRequests = await requestsAPI.getAll();
-      const myRequests = userRequests.filter(r => r.user?._id === user.id);
-
-      const notifs = [
-        ...pendingOrders.map(order => ({
-          id: order._id,
-          type: 'order',
-          title: 'New Order Request',
-          message: `${order.borrower?.name} wants to borrow your ${order.item?.title}`,
-          time: new Date(order.createdAt),
-          link: '/profile'
-        })),
-        ...myRequests.map(req => ({
-          id: req._id,
-          type: 'request',
-          title: 'Your Request',
-          message: `Looking for: ${req.itemName}`,
-          time: new Date(req.createdAt),
-          link: '/request-map'
-        }))
-      ];
-
-      // Sort by time, most recent first
-      notifs.sort((a, b) => b.time - a.time);
-      
-      setNotifications(notifs.slice(0, 5)); // Show only 5 most recent
-      setNotificationCount(pendingOrders.length); // Only count pending orders
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    }
-  };
 
   const handleLogout = () => {
     logout();
